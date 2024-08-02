@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Artigos da Wikipedia</title>
+    <style>
+        /* Estilos básicos para o corpo da página */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        /* Estilo para o campo de entrada de texto */
+        #searchInput {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+        }
+        /* Estilo para o botão de busca */
+        #searchButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        /* Estilo para a área de resultados */
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Buscador de Artigos da Wikipedia</h2>
+    <!-- Campo de entrada para o nome do artigo -->
+    <input type="text" id="searchInput" placeholder="Digite o nome do artigo">
+    <!-- Botão para iniciar a busca -->
+    <button id="searchButton">Buscar</button>
+    <!-- Div onde os resultados da busca serão exibidos -->
+    <div id="result"></div>
+
+    <script>
+        // Adiciona um evento de clique ao botão de busca
+        document.getElementById('searchButton').addEventListener('click', function() {
+            // Obtém o termo de busca do campo de entrada
+            var searchTerm = document.getElementById('searchInput').value;
+            // Chama a função para buscar o artigo na Wikipedia
+            searchWikipedia(searchTerm);
+        });
+
+        // Função para buscar um artigo na Wikipedia
+        function searchWikipedia(term) {
+            // URL da API da Wikipedia com o termo de busca e parâmetros necessários
+            var url = `https://pt.wikipedia.org/w/api.php?action=opensearch&format=json&search=${term}&limit=1&namespace=0&origin=*`;
+
+            // Faz a requisição à API da Wikipedia
+            fetch(url)
+                .then(response => response.json()) // Converte a resposta em JSON
+                .then(data => {
+                    console.log(data); // Exibe os dados no console para depuração
+                    // Verifica se há resultados para o termo de busca
+                    if (data[1].length > 0) {
+                        // Obtém a URL do primeiro artigo encontrado
+                        var articleUrl = data[3][0];
+                        // Exibe o link do artigo encontrado na div de resultados
+                        document.getElementById('result').innerHTML = `<a href="${articleUrl}" target="_blank">${data[1][0]}</a>`;
+                    } else {
+                        // Exibe mensagem caso nenhum artigo seja encontrado
+                        document.getElementById('result').innerHTML = 'Artigo não encontrado.';
+                    }
+                })
+                .catch(error => {
+                    // Exibe mensagem de erro caso a requisição falhe
+                    console.error('Erro ao buscar artigo:', error);
+                    document.getElementById('result').innerHTML = 'Erro ao buscar artigo.';
+                });
+        }
+    </script>
+</body>
+</html>
